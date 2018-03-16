@@ -20,7 +20,7 @@ class trainer():
         self.step=step
 
     def train(self):
-        maxloop=1000
+        maxloop=100000
         for i in range(maxloop):
             self.trainfile()
 
@@ -30,9 +30,11 @@ class trainer():
         feature,category=self.cr.readafile(idx)
         for i in range(self.caSIZE):
             out.append(np.dot(feature,self.md.outputlayer[i]))
-        # print(out)
-        output=self.softmax(out)
+
+        output = self.softmax(out)
+        print(out)
         ca=self.md.category[idx].index(max(self.md.category[idx]))
+
         if(ca==output.index(max(output))):
             print("分类正确")
         else:
@@ -40,11 +42,11 @@ class trainer():
         e=0
         for i in range(self.caSIZE):
             if i==ca:
-                e=e+self.step*(output[i]-1)*self.md.outputlayer[i]
-                self.md.outputlayer[i]=self.md.outputlayer[i]+self.step*(output[i]-1)*feature
+                e=e-self.step*(output[i]-1)*self.md.outputlayer[i]
+                self.md.outputlayer[i]=self.md.outputlayer[i]-self.step*(output[i]-1)*feature
             else:
-                e = e - self.step * output[i] * self.md.outputlayer[i]
-                self.md.outputlayer[i] = self.md.outputlayer[i] - self.step * output[i] * feature
+                e = e + self.step * output[i] * self.md.outputlayer[i]
+                self.md.outputlayer[i] = self.md.outputlayer[i] + self.step * output[i] * feature
         for i in self.md.dic_list[idx].keys():
             self.md.dic[i]=self.md.dic[i]+e
 
