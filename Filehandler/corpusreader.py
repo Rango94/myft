@@ -14,8 +14,9 @@ class corpusreader():
         for i in self.dic_list[idx].keys():
             total+=self.dic_list[idx][i]
             feature+=self.dic[i]*self.dic_list[idx][i]
-
-        return feature/total,self.category[idx]
+        if total==0:
+            return 0
+        return feature/total
 
 
 
