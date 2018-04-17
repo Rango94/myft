@@ -32,6 +32,7 @@ class model():
                         tmp_ca.append(0)
                 self.category.append(tmp_ca)
                 self.filelist.append(root+"/"+name)
+        print("种类："+str(len(self.category_name)))
         self.genareteoutputlayer()
         for i in range(len(self.filelist)):
             if i%100==0:
@@ -142,6 +143,7 @@ class model():
     def predict(self,path):
         self.filelist=[]
         self.category=[]
+        consu={}
         right=0
         leng=len(self.category_name)
         for root, dirs, files in os.walk(path):
@@ -155,6 +157,7 @@ class model():
                 self.category.append(tmp_ca)
                 self.filelist.append(root+"/"+name)
         num=0
+        print("预测种类："+str(len(self.category_name)))
         for i in range(len(self.filelist)):
             f = open(self.filelist[i], "r", encoding="utf-8")
             line = f.readline()
@@ -174,6 +177,19 @@ class model():
             out=[]
             for ca_tmp in range(len(self.category_name)):
                 out.append(np.dot(feature,self.outputlayer[ca_tmp]))
+            if self.category[i].index(max(self.category[i])) not in consu.keys():
+                consu[self.category[i].index(max(self.category[i]))]={}
+                for qq in range(len(self.category_name)):
+                    consu[self.category[i].index(max(self.category[i]))][qq]=0
+                if out.index(max(out)) not in consu[self.category[i].index(max(self.category[i]))]:
+                    consu[self.category[i].index(max(self.category[i]))][out.index(max(out))]=1
+                else:
+                    consu[self.category[i].index(max(self.category[i]))][out.index(max(out))] += 1
+            else:
+                if out.index(max(out)) not in consu[self.category[i].index(max(self.category[i]))]:
+                    consu[self.category[i].index(max(self.category[i]))][out.index(max(out))]=1
+                else:
+                    consu[self.category[i].index(max(self.category[i]))][out.index(max(out))] += 1
             if out.index(max(out))==self.category[i].index(max(self.category[i])):
                 right+=1
             else:
@@ -183,7 +199,33 @@ class model():
                 print("-----------------------")
         print(num)
         print(right)
+        trr=""
+        for i in self.category_name:
+            trr+=i+"\t"
+        print(trr)
+        consu=draw(consu)
+        print(consu)
+        for i in consu:
+            srr=""
+            for j in i:
+                srr+=str(j)+"\t"
+            print(srr)
         print(right/len(self.filelist))
+
+
+def draw(consu):
+    print(consu)
+    out=np.zeros((28,28))
+    for i in consu.keys():
+        tmp=[]
+        total=0
+        for j in consu[i]:
+            tmp.append(consu[i][j])
+        # for j in consu[i]:
+        #     tmp.append(consu[i][j]/total)
+        out[i]=np.array(tmp)
+    return out
+
 
 
 
