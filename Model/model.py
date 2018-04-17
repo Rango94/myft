@@ -25,7 +25,7 @@ class model():
                     self.category_name[name.split("_")[0]]=na
                     na+=1
                 tmp_ca=[]
-                for k in range(6):
+                for k in range(len(self.category_name)):
                     if k==self.category_name[name.split("_")[0]]:
                         tmp_ca.append(1)
                     else:
@@ -46,7 +46,7 @@ class model():
         line=f.readline()
         Line=""
         while(line!=""):
-            Line+=self.cn(line)
+            Line+=self.cn(line.replace(",",""))
             line=f.readline()
         for i in jieba.cut(Line, cut_all=False):
             if i not in self.dic_tmp:
@@ -80,9 +80,6 @@ class model():
     def genareteoutputlayer(self):
         vecs=[]
         for k in range(len(self.category_name)):
-            # vec = []
-            # for i in range(self.SIZE):
-            #     vec.append((0.5 - random.random()) / self.SIZE)
             vec=np.zeros(self.SIZE)
             vecs.append(vec)
         self.outputlayer=np.array(vecs)
@@ -140,20 +137,24 @@ class model():
             self.category_name[name[idx]]=i
             self.outputlayer[i]=np.array(outputlayer[idx])
             idx+=1
-        print(self.category_name)
+
 
     def predict(self,path):
+        self.filelist=[]
+        self.category=[]
         right=0
+        leng=len(self.category_name)
         for root, dirs, files in os.walk(path):
             for name in files:
                 tmp_ca = []
-                for k in range(6):
+                for k in range(leng):
                     if k == self.category_name[name.split("_")[0]]:
                         tmp_ca.append(1)
                     else:
                         tmp_ca.append(0)
                 self.category.append(tmp_ca)
                 self.filelist.append(root+"/"+name)
+        num=0
         for i in range(len(self.filelist)):
             f = open(self.filelist[i], "r", encoding="utf-8")
             line = f.readline()
@@ -176,9 +177,12 @@ class model():
             if out.index(max(out))==self.category[i].index(max(self.category[i])):
                 right+=1
             else:
+                num+=1
                 print(out)
                 print(self.category[i])
                 print("-----------------------")
+        print(num)
+        print(right)
         print(right/len(self.filelist))
 
 

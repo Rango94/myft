@@ -20,10 +20,9 @@ class trainer():
         self.step=step
 
     def train(self):
-        maxloop=50000
+        maxloop=300000
         for i in range(maxloop):
             self.step=self.Step*(1-i/maxloop)
-            print(self.step)
             self.trainfile()
         return self.md
 
@@ -40,7 +39,6 @@ class trainer():
                 out.append(np.dot(feature,self.md.outputlayer[i]))
             output = self.softmax(out)
             ca=self.md.category[idx].index(max(self.md.category[idx]))
-
             if(ca==output.index(max(output))):
                 print("分类正确")
             else:
@@ -58,7 +56,7 @@ class trainer():
 
 
     def softmax(self,vec):
-        total=0;
+        total=0
         out=[]
         for i in vec:
             total+=math.pow(math.e,i)
